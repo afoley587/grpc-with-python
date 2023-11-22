@@ -21,18 +21,14 @@ service ChatService {
 // accept a user who the message is coming from, which
 // chat room it is in, and the message to send
 message MessageRequest {
-  string user_from = 1;
-  string chat_room = 2;
-  string message = 3;
+  string message = 1;
 }
 
 // This is the reply we will get back from our server. We will
 // expect a user who the message is coming from, which
 // chat room it is in, and the message to send
 message MessageReply {
-  string user_from = 1;
-  string chat_room = 2;
-  string message = 3;
+  string message = 1;
 }
 
 // An empty request for requesting messages or

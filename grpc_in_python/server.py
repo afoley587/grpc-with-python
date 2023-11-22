@@ -32,11 +32,9 @@ class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
         async for new_msg in request_iterator:
             self.messages_received.append(new_msg)
             resp = chat_pb2.MessageReply(
-                message=f"Server Responding to {new_msg.message}",
-                user_from="server",
-                chat_room=new_msg.chat_room,
+                message=f"Server Responding to {new_msg.message}"
             )
-            logger.info(f"Server side got: {new_msg.message} in {new_msg.chat_room}")
+            logger.info(f"Server side got: {new_msg.message}")
             yield resp
 
 

@@ -282,3 +282,16 @@ service to the server and start the server.
 We can run this with `python server.py`.
 
 ## Part III: The Client
+The client will be a bit simpler than our server. It will be a command line interface
+which accepts one of three actions: 
+1. An option to send messages
+2. An option to request stats from the server
+3. An option to request all messages from the server
+
+To save on reading time, we aren't going to go over adding arguments to a command
+line interface in python, we will focus more on the actual gRPC portions of the code.
+
+## Running
+
+## References
+All code can be found [here on GitHub](https://github.com/afoley587/grpc-with-python)!

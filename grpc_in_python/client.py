@@ -33,7 +33,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_messages_from_user(user: str, chat_room: str) -> List[chat_pb2.MessageRequest]:
+def get_messages_from_user() -> List[chat_pb2.MessageRequest]:
     msgs = []
     while True:
         _msg = input("Write a message! Type 'done' to send!: ").strip()
@@ -41,54 +41,40 @@ def get_messages_from_user(user: str, chat_room: str) -> List[chat_pb2.MessageRe
         if _msg.lower() == "done":
             break
 
-        msgs.append(
-            chat_pb2.MessageRequest(user_from=user, chat_room=chat_room, message=_msg)
-        )
+        msgs.append(chat_pb2.MessageRequest(message=_msg))
     return msgs
 
 
-async def chat(stub: chat_pb2_grpc.ChatServiceStub, user: str, chat_room: str) -> None:
-    # gRPC AsyncIO bidi-streaming RPC API accepts both synchronous iterables
-    # and async iterables.
-    call = stub.SendAndReceiveMessage(get_messages_from_user(user, chat_room))
-    async for response in call:
-        logger.info(f"Received message {response.message} in {response.chat_room}")
+async def chat(stub: chat_pb2_grpc.ChatServiceStub) -> None:
+    messages = stub.SendAndReceiveMessage(get_messages_from_user())
+    async for message in messages:
+        logger.info(f"Received message {message.message}")
 
 
-async def stat(stub: chat_pb2_grpc.ChatServiceStub, user: str, chat_room: str) -> None:
-    # gRPC AsyncIO bidi-streaming RPC API accepts both synchronous iterables
-    # and async iterables.
-    request = chat_pb2.EmptyRequest()
-    stats = await stub.GetStats(request)
+async def stat(stub: chat_pb2_grpc.ChatServiceStub) -> None:
+    stats = await stub.GetStats(chat_pb2.EmptyRequest())
     logger.info(f"Server has {stats.num_messages} messages")
 
 
-async def read(stub: chat_pb2_grpc.ChatServiceStub, user: str, chat_room: str) -> None:
-    # gRPC AsyncIO bidi-streaming RPC API accepts both synchronous iterables
-    # and async iterables.
-    request = chat_pb2.EmptyRequest()
-    call = stub.GetMessages(request)
-    async for response in call:
-        logger.info(f"Received message {response.message} in {response.chat_room}")
+async def read(stub: chat_pb2_grpc.ChatServiceStub) -> None:
+    messages = stub.GetMessages(chat_pb2.EmptyRequest())
+    async for message in messages:
+        logger.info(f"Received message {message.message}")
 
 
 async def main() -> None:
     args = parse_args()
-
-    # if args.send_chat
-    # if args.get_stats
-    # if args.read_all_messages
     async with grpc.aio.insecure_channel("localhost:50051") as channel:
         stub = chat_pb2_grpc.ChatServiceStub(channel)
 
         if args.chat:
-            await chat(stub, "test_user", "test_room")
+            await chat(stub)
 
         if args.stat:
-            await stat(stub, "test_user", "test_room")
+            await stat(stub)
 
         if args.read:
-            await read(stub, "test_user", "test_room")
+            await read(stub)
 
 
 if __name__ == "__main__":
