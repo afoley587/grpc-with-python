@@ -1,4 +1,5 @@
 # 1 Dollar DevOps: Building Your First gRPC-enabled Python App
+
 ## Introduction
 Hey, fellow tech enthusiasts! Today, we're diving headfirst into the exciting 
 world of gRPC – the not-so-secret sauce that's been causing a buzz in the 
@@ -69,3 +70,22 @@ just want to see if we can build the same system without websockets. Note
 that this really isn't a blog post about "HOW TO BUILD A CHAT ROOM SYSTEM!!!"
 but more of a blog post about "Dipping your toes into gRPC with python".
 
+Our system will have three methods:
+1. A method to send more chats to the server. In this case, we will
+    have a bi-directional channel so that the client can send messages
+    while simultaneously retrieving them from the server as well. For 
+    each message the server receives, it will send back an acknowledgement
+    over it's side of the channel as the client keeps sending more.
+2. A method to see how many messages have been sent to the server. In this 
+    case, we can implement a simple RPC. We can do pretty much a point and 
+    shoot thing here where we ask the server how many messages its read and
+    it can respond with the actual number.
+3. A method to read all of the messages from the server. In this case,
+    we can implement a response streaming RPC. We can request all of the
+    messages from the server, and it can send them one by one over the channel.
+
+## Part I: The Protobuf
+
+## Part II: The Server
+
+## Part III: The Client

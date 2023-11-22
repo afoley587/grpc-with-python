@@ -12,7 +12,12 @@ class MessageRequest(_message.Message):
     user_from: str
     chat_room: str
     message: str
-    def __init__(self, user_from: _Optional[str] = ..., chat_room: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        user_from: _Optional[str] = ...,
+        chat_room: _Optional[str] = ...,
+        message: _Optional[str] = ...,
+    ) -> None: ...
 
 class MessageReply(_message.Message):
     __slots__ = ["user_from", "chat_room", "message"]
@@ -22,7 +27,12 @@ class MessageReply(_message.Message):
     user_from: str
     chat_room: str
     message: str
-    def __init__(self, user_from: _Optional[str] = ..., chat_room: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        user_from: _Optional[str] = ...,
+        chat_room: _Optional[str] = ...,
+        message: _Optional[str] = ...,
+    ) -> None: ...
 
 class EmptyRequest(_message.Message):
     __slots__ = []
