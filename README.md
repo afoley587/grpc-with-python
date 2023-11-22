@@ -115,6 +115,77 @@ method which accepts a stream of `MessageRequest` and responds with a stream
 of `MessageReply`. So, both the client and the server can simultaneously read
 and write on to their respective channels. Fun!
 
+We next define our message structures:
+
+```proto
+// This is the request we will send to our server. We will
+// accept a user who the message is coming from, which
+// chat room it is in, and the message to send
+message MessageRequest {
+  string user_from = 1;
+  string chat_room = 2;
+  string message = 3;
+}
+
+// This is the reply we will get back from our server. We will
+// expect a user who the message is coming from, which
+// chat room it is in, and the message to send
+message MessageReply {
+  string user_from = 1;
+  string chat_room = 2;
+  string message = 3;
+}
+
+// An empty request for requesting messages or
+// stats from the server
+message EmptyRequest {}
+
+// A statis request from the server
+message StatsReply {
+  int32 num_messages = 1;
+}
+```
+
+We have four message structures:
+1. `MessageRequest` - A message to be sent to the server with
+    a username, chat room name, and a message
+2. `MessageReply`- A message acknowledgement to be sent from the server 
+    with a username, chat room name, and a message
+3. `EmptyRequest` - A generic empty request
+4. `StatsReply` - A stat's reply message with an integer number of messages
+
+Note that in a production system, you likely wouldn't want to use a generic
+empty request as it makes decoupling your code a bit harder when you want
+to make changes.
+
+We can compile our protocol buffers using the python library, `grpc_tools`.
+In the most basic form, we can run something like the below:
+
+```shell
+python -m grpc_tools.protoc \
+    -I/path/to/protobuf/imports \
+    --python_out=/path/to/python/directory \
+    --pyi_out=/path/to/python/directory \
+    --grpc_python_out=/path/to/python/directory \
+    /path/to/proto/file
+```
+
+And in our file structure:
+```shell
+python -m grpc_tools.protoc \
+    -I../protos \
+    --python_out=. \
+    --pyi_out=. \
+    --grpc_python_out=. \
+    ../protos/chat.proto
+
+```
+
+If you list your python directory, you would see three new files:
+* `chat_pb2_grpc.py` - Your service classes and client stubs
+* `chat_pb2.py` - Your exported message structures
+* `chat_pb2.pyi` - The python interfaces of the message structures
+
 ## Part II: The Server
 
 ## Part III: The Client
