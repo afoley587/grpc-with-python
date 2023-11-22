@@ -7,6 +7,8 @@ software development scene. What's the deal with gRPC, you ask? Well, it's
 not your typical acronym; it stands for "gRPC Remote Procedure Call," and 
 it's a game-changer when it comes to building distributed systems.
 
+![gRPC](./images/grpc.png)
+
 Imagine a toolkit, but not just any toolkit – one that redefines how we craft 
 and connect pieces of software. That's gRPC for you, a brainchild of the folks 
 at Google. Originally cooked up for Google's internal use, gRPC has since 
@@ -174,7 +176,6 @@ python -m grpc_tools.protoc \
     --pyi_out=. \
     --grpc_python_out=. \
     ../protos/chat.proto
-
 ```
 
 If you list your python directory, you would see three new files:
@@ -395,7 +396,7 @@ Write a message! Type 'done' to send!: done
 
 We can see the messages come through on the server as well:
 ```shell
-prompt> poetry run python client.py --chat  
+prompt> poetry run python server.py
 
 2023-11-22 16:02:47.348 | INFO     | __main__:SendAndReceiveMessage:26 - Server side got: hello
 2023-11-22 16:02:47.348 | INFO     | __main__:SendAndReceiveMessage:26 - Server side got: world
@@ -421,6 +422,10 @@ prompt> poetry run python client.py --read-messages
 2023-11-22 16:04:29.906 | INFO     | __main__:read:62 - Received message aaaaand
 prompt> 
 ```
+
+![gRPC](./images/grpc.gif)
+
+And you have officially made your first gRPC client and server!
 
 ## References
 All code can be found [here on GitHub](https://github.com/afoley587/grpc-with-python)!
