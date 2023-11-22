@@ -122,18 +122,14 @@ We next define our message structures:
 // accept a user who the message is coming from, which
 // chat room it is in, and the message to send
 message MessageRequest {
-  string user_from = 1;
-  string chat_room = 2;
-  string message = 3;
+  string message = 1;
 }
 
 // This is the reply we will get back from our server. We will
 // expect a user who the message is coming from, which
 // chat room it is in, and the message to send
 message MessageReply {
-  string user_from = 1;
-  string chat_room = 2;
-  string message = 3;
+  string message = 1;
 }
 
 // An empty request for requesting messages or
@@ -209,6 +205,19 @@ class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
     def __init__(self):
         self.messages_received: List[chat_pb2.MessageRequest] = []
 
+    async def SendAndReceiveMessage(
+        self,
+        request_iterator: AsyncIterable[chat_pb2.MessageRequest],
+        unused_context,
+    ) -> AsyncIterable[chat_pb2.MessageReply]:
+        async for new_msg in request_iterator:
+            self.messages_received.append(new_msg)
+            resp = chat_pb2.MessageReply(
+                message=f"Server Responding to {new_msg.message}"
+            )
+            logger.info(f"Server side got: {new_msg.message}")
+            yield resp
+
     async def GetStats(
         self, request: chat_pb2.EmptyRequest, unused_context
     ) -> chat_pb2.StatsReply:
@@ -219,21 +228,6 @@ class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
     ) -> AsyncIterable[chat_pb2.MessageReply]:
         for msg in self.messages_received:
             yield msg
-
-    async def SendAndReceiveMessage(
-        self,
-        request_iterator: AsyncIterable[chat_pb2.MessageRequest],
-        unused_context,
-    ) -> AsyncIterable[chat_pb2.MessageReply]:
-        async for new_msg in request_iterator:
-            self.messages_received.append(new_msg)
-            resp = chat_pb2.MessageReply(
-                message=f"Server Responding to {new_msg.message}",
-                user_from="server",
-                chat_room=new_msg.chat_room,
-            )
-            logger.info(f"Server side got: {new_msg.message} in {new_msg.chat_room}")
-            yield resp
 ```
 
 Most of the imports seem standard, but what are these two lines:
@@ -250,6 +244,12 @@ defined in the `chat_pb2_grpc` file.
 The methods in the service should look extremely familiar because, again,
 they were defined in our protobuf files. Let's break them down one-by-one.
 
+`SendAndReceiveMessage` accepts a request of 
+`AsyncIterable[chat_pb2.MessageRequest]`. So our client would call this 
+method with multiple messages. The server would then go through the messages
+asyncronously and acknowledge it with a response of type `MessageReply`. This,
+again, returns an `AsyncIterable`.
+
 `GetStats` accepts a request of type `EmptyRequest`. It then counts the
 number of messages it has in memory and returns a `StatsReply` with
 that number of messages.
@@ -258,12 +258,6 @@ that number of messages.
 through the messages it has seen before and to puts them on 
 the stream. Note that this methoud returns an `AsyncIterable`, so the client 
 will do an `async for ...` over the response from this method.
-
-`SendAndReceiveMessage` accepts a request of 
-`AsyncIterable[chat_pb2.MessageRequest]`. So our client would call this 
-method with multiple messages. The server would then go through the messages
-asyncronously and acknowledge it with a response of type `MessageReply`. This,
-again, returns an `AsyncIterable`.
 
 Finally, we need a way to run the server! Let's define a `serve` method:
 
@@ -290,6 +284,83 @@ which accepts one of three actions:
 
 To save on reading time, we aren't going to go over adding arguments to a command
 line interface in python, we will focus more on the actual gRPC portions of the code.
+
+Let's first take a look at our entrypoint (`main`) and then dissect each method:
+
+```python
+async def main() -> None:
+    args = parse_args()
+    async with grpc.aio.insecure_channel("localhost:50051") as channel:
+        stub = chat_pb2_grpc.ChatServiceStub(channel)
+
+        if args.chat:
+            await chat(stub)
+
+        if args.stat:
+            await stat(stub)
+
+        if args.read:
+            await read(stub)
+```
+
+We first initialize a connection with our gRPC server. Then, we create a stub. As
+previously noted, stubs are how the client will send, call, and use the remote server.
+The stub will have the same method signatures that are defined in your protobuf and will
+be used just like you're calling a function call locally.
+
+Let's take a look at the `chat` method:
+
+```python
+def get_messages_from_user() -> List[chat_pb2.MessageRequest]:
+    msgs = []
+    while True:
+        _msg = input("Write a message! Type 'done' to send!: ").strip()
+
+        if _msg.lower() == "done":
+            break
+
+        msgs.append(chat_pb2.MessageRequest(message=_msg))
+    return msgs
+
+async def chat(stub: chat_pb2_grpc.ChatServiceStub) -> None:
+    messages = stub.SendAndReceiveMessage(get_messages_from_user())
+    async for message in messages:
+        logger.info(f"Received message {message.message}")
+```
+
+We see that it takes the service stub as an argument. It then gets a bunch
+of messages from a user, and then uses the stub's `SendAndReceiveMessage` to
+send these messages as a stream. The return from `stub.SendAndReceiveMessage`
+will be an `AsyncIterator`, so we can then wait for them to be acknowledged by the
+server.
+
+Let's next look at our `stat` method:
+```python
+async def stat(stub: chat_pb2_grpc.ChatServiceStub) -> None:
+    stats = await stub.GetStats(chat_pb2.EmptyRequest())
+    logger.info(f"Server has {stats.num_messages} messages")
+```
+
+This method is very simple. It just calls the method `GetStats` from our
+stub. Because this method isn't a stream, either on the client nor the server side,
+there are no for loops. We just call the method as we normally would and use the
+response from the method.
+
+Let's finally look at our `read` method:
+```python
+async def read(stub: chat_pb2_grpc.ChatServiceStub) -> None:
+    messages = stub.GetMessages(chat_pb2.EmptyRequest())
+    async for message in messages:
+        logger.info(f"Received message {message.message}")
+```
+
+This method is also pretty simple. It just calls the `GetMessages` to
+request all of the messages from the server as a stream. 
+The return from `stub.GetMessages` will be an `AsyncIterator`, so we can loop over
+each message and then print out its contents.
+
+Amazing! We have a fully functional client which can interact with our server
+using gRPC instead of something like TCP or REST!
 
 ## Running
 

@@ -13,17 +13,6 @@ class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
     def __init__(self):
         self.messages_received: List[chat_pb2.MessageRequest] = []
 
-    async def GetStats(
-        self, request: chat_pb2.EmptyRequest, unused_context
-    ) -> chat_pb2.StatsReply:
-        return chat_pb2.StatsReply(num_messages=len(self.messages_received))
-
-    async def GetMessages(
-        self, request: chat_pb2.EmptyRequest, unused_context
-    ) -> AsyncIterable[chat_pb2.MessageReply]:
-        for msg in self.messages_received:
-            yield msg
-
     async def SendAndReceiveMessage(
         self,
         request_iterator: AsyncIterable[chat_pb2.MessageRequest],
@@ -36,6 +25,17 @@ class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
             )
             logger.info(f"Server side got: {new_msg.message}")
             yield resp
+
+    async def GetStats(
+        self, request: chat_pb2.EmptyRequest, unused_context
+    ) -> chat_pb2.StatsReply:
+        return chat_pb2.StatsReply(num_messages=len(self.messages_received))
+
+    async def GetMessages(
+        self, request: chat_pb2.EmptyRequest, unused_context
+    ) -> AsyncIterable[chat_pb2.MessageReply]:
+        for msg in self.messages_received:
+            yield msg
 
 
 async def serve() -> None:
