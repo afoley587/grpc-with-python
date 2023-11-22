@@ -283,7 +283,11 @@ which accepts one of three actions:
 3. An option to request all messages from the server
 
 To save on reading time, we aren't going to go over adding arguments to a command
-line interface in python, we will focus more on the actual gRPC portions of the code.
+line interface in python, we will focus more on the actual gRPC portions of the code. However,
+it is good to know that the client supports three arguments:
+* `--chat` to send chat messages
+* `--get-stats` to get stats from the server
+* `--read-messages` to read all messages from the server
 
 Let's first take a look at our entrypoint (`main`) and then dissect each method:
 
@@ -363,6 +367,60 @@ Amazing! We have a fully functional client which can interact with our server
 using gRPC instead of something like TCP or REST!
 
 ## Running
+We will need two terminals for this to work, one for the server and one for
+the client.
+
+Let's open one terminal and run the following:
+```shell
+prompt> poetry run python server.py
+```
+
+Let's open another terminal and run the following:
+```shell
+prompt> poetry run python client.py --chat  
+```
+
+And let's start chatting:
+```shell
+prompt> poetry run python client.py --chat
+
+Write a message! Type 'done' to send!: hello
+Write a message! Type 'done' to send!: world
+Write a message! Type 'done' to send!: aaaaand
+Write a message! Type 'done' to send!: done
+2023-11-22 16:02:47.348 | INFO     | __main__:chat:51 - Received message Server Responding to hello
+2023-11-22 16:02:47.349 | INFO     | __main__:chat:51 - Received message Server Responding to world
+2023-11-22 16:02:47.349 | INFO     | __main__:chat:51 - Received message Server Responding to aaaaand
+```
+
+We can see the messages come through on the server as well:
+```shell
+prompt> poetry run python client.py --chat  
+
+2023-11-22 16:02:47.348 | INFO     | __main__:SendAndReceiveMessage:26 - Server side got: hello
+2023-11-22 16:02:47.348 | INFO     | __main__:SendAndReceiveMessage:26 - Server side got: world
+2023-11-22 16:02:47.349 | INFO     | __main__:SendAndReceiveMessage:26 - Server side got: aaaaand
+```
+
+Let's try our client with a different flag to get the stats from the server:
+
+```shell
+prompt> poetry run python client.py --get-stats
+
+2023-11-22 16:04:00.254 | INFO     | __main__:stat:56 - Server has 3 messages
+prompt> 
+```
+
+And we can finally read all messages from the server:
+
+```shell
+prompt> poetry run python client.py --read-messages
+
+2023-11-22 16:04:29.905 | INFO     | __main__:read:62 - Received message hello
+2023-11-22 16:04:29.906 | INFO     | __main__:read:62 - Received message world
+2023-11-22 16:04:29.906 | INFO     | __main__:read:62 - Received message aaaaand
+prompt> 
+```
 
 ## References
 All code can be found [here on GitHub](https://github.com/afoley587/grpc-with-python)!
