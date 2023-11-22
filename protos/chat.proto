@@ -7,8 +7,6 @@ syntax = "proto3";
 // This package will be prefixed with grpc.chat
 package grpc.chat;
 
-// option objc_class_prefix = "CHAT";
-
 // Defines our service interface with methods
 service ChatService {
   // Get high level stats from the server

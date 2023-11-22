@@ -85,6 +85,35 @@ Our system will have three methods:
     messages from the server, and it can send them one by one over the channel.
 
 ## Part I: The Protobuf
+Let's first go through the protocol buffers which will define our service 
+interface and all data structures that will pass through our interface.
+
+First, the service:
+
+```proto
+// Defines our service interface with methods
+service ChatService {
+  // Get high level stats from the server
+  rpc GetStats(EmptyRequest) returns (StatsReply) {}
+  // Stream the current messages from the server
+  rpc GetMessages(EmptyRequest) returns (stream MessageReply) {}
+  // Sends and receives chat messages bi-directionally
+  rpc SendAndReceiveMessage (stream MessageRequest) returns (stream MessageReply) {}
+}
+```
+
+As we can see, we have three methods in our service. These each correlate
+to the methods we discussed in the previous section. We see that
+our `GetStats` method takes an `EmptyRequest` as a parameter and returns
+a `StatsReply` response. You'll notice the word `stream` isn't anywhere
+in this method signature, so it's a simple RPC. There isn't any streaming
+on this method. Next, we see the `GetMessages` method takes an `EmptyRequest`
+and returns a stream of `MessageReply`. Meaning that this method will write
+each message onto the channel as the server processes them. This is an example
+of a Response Streaming RPC. Finally, we have the `SendAndReceiveMessage`
+method which accepts a stream of `MessageRequest` and responds with a stream
+of `MessageReply`. So, both the client and the server can simultaneously read
+and write on to their respective channels. Fun!
 
 ## Part II: The Server
 

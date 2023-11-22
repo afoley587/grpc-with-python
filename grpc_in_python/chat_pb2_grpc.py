@@ -6,10 +6,7 @@ import chat_pb2 as chat__pb2
 
 
 class ChatServiceStub(object):
-    """option objc_class_prefix = "CHAT";
-
-    Defines our service interface with methods
-    """
+    """Defines our service interface with methods"""
 
     def __init__(self, channel):
         """Constructor.
@@ -35,10 +32,7 @@ class ChatServiceStub(object):
 
 
 class ChatServiceServicer(object):
-    """option objc_class_prefix = "CHAT";
-
-    Defines our service interface with methods
-    """
+    """Defines our service interface with methods"""
 
     def GetStats(self, request, context):
         """Get high level stats from the server"""
@@ -85,10 +79,7 @@ def add_ChatServiceServicer_to_server(servicer, server):
 
 # This class is part of an EXPERIMENTAL API.
 class ChatService(object):
-    """option objc_class_prefix = "CHAT";
-
-    Defines our service interface with methods
-    """
+    """Defines our service interface with methods"""
 
     @staticmethod
     def GetStats(
