@@ -1,0 +1,43 @@
+// COMPILING
+// python -m grpc_tools.protoc -I../protos --python_out=. --pyi_out=. --grpc_python_out=. ../protos/chat.proto
+// Use protobuf syntax 3, which is a bit simplified and
+// cleaner as opposed to previous versions
+syntax = "proto3";
+
+// This package will be prefixed with grpc.chat
+package grpc.chat;
+
+// option objc_class_prefix = "CHAT";
+
+// Defines our service interface with methods
+service ChatService {
+  // Sends and receives chat messages bi-directionally
+  rpc GetStats(StatsRequest) returns (StatsReply) {}
+  rpc GetMessages(StatsRequest) returns (stream MessageReply) {}
+  rpc SendAndReceiveMessage (stream MessageRequest) returns (stream MessageReply) {}
+}
+
+// This is the request we will send to our server. We will
+// accept a user who the message is coming from, which
+// chat room it is in, and the message to send
+message MessageRequest {
+  string user_from = 1;
+  string chat_room = 2;
+  string message = 3;
+}
+
+// This is the reply we will get back from our server. We will
+// expect a user who the message is coming from, which
+// chat room it is in, and the message to send
+message MessageReply {
+  string user_from = 1;
+  string chat_room = 2;
+  string message = 3;
+}
+
+message StatsRequest {}
+
+message StatsReply {
+  int32 num_messages = 1;
+}
+

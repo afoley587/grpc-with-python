@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "grpc-in-python"
+version = "0.1.0"
+description = ""
+authors = ["Alexander Foley <alexandergfoley@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+grpcio-tools = "^1.59.3"
+grpcio = "^1.59.3"
+asyncio = "^3.4.3"
+loguru = "^0.7.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
