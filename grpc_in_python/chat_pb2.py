@@ -6,28 +6,29 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-
-
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nchat.proto\x12\tgrpc.chat\"G\n\x0eMessageRequest\x12\x11\n\tuser_from\x18\x01 \x01(\t\x12\x11\n\tchat_room\x18\x02 \x01(\t\x12\x0f\n\x07message\x18\x03 \x01(\t\"E\n\x0cMessageReply\x12\x11\n\tuser_from\x18\x01 \x01(\t\x12\x11\n\tchat_room\x18\x02 \x01(\t\x12\x0f\n\x07message\x18\x03 \x01(\t\"\x0e\n\x0cStatsRequest\"\"\n\nStatsReply\x12\x14\n\x0cnum_messages\x18\x01 \x01(\x05\x32\xe3\x01\n\x0b\x43hatService\x12<\n\x08GetStats\x12\x17.grpc.chat.StatsRequest\x1a\x15.grpc.chat.StatsReply\"\x00\x12\x43\n\x0bGetMessages\x12\x17.grpc.chat.StatsRequest\x1a\x17.grpc.chat.MessageReply\"\x00\x30\x01\x12Q\n\x15SendAndReceiveMessage\x12\x19.grpc.chat.MessageRequest\x1a\x17.grpc.chat.MessageReply\"\x00(\x01\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b'\n\nchat.proto\x12\tgrpc.chat"G\n\x0eMessageRequest\x12\x11\n\tuser_from\x18\x01 \x01(\t\x12\x11\n\tchat_room\x18\x02 \x01(\t\x12\x0f\n\x07message\x18\x03 \x01(\t"E\n\x0cMessageReply\x12\x11\n\tuser_from\x18\x01 \x01(\t\x12\x11\n\tchat_room\x18\x02 \x01(\t\x12\x0f\n\x07message\x18\x03 \x01(\t"\x0e\n\x0cStatsRequest""\n\nStatsReply\x12\x14\n\x0cnum_messages\x18\x01 \x01(\x05\x32\xe3\x01\n\x0b\x43hatService\x12<\n\x08GetStats\x12\x17.grpc.chat.StatsRequest\x1a\x15.grpc.chat.StatsReply"\x00\x12\x43\n\x0bGetMessages\x12\x17.grpc.chat.StatsRequest\x1a\x17.grpc.chat.MessageReply"\x00\x30\x01\x12Q\n\x15SendAndReceiveMessage\x12\x19.grpc.chat.MessageRequest\x1a\x17.grpc.chat.MessageReply"\x00(\x01\x30\x01\x62\x06proto3'
+)
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'chat_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "chat_pb2", _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-  DESCRIPTOR._options = None
-  _globals['_MESSAGEREQUEST']._serialized_start=25
-  _globals['_MESSAGEREQUEST']._serialized_end=96
-  _globals['_MESSAGEREPLY']._serialized_start=98
-  _globals['_MESSAGEREPLY']._serialized_end=167
-  _globals['_STATSREQUEST']._serialized_start=169
-  _globals['_STATSREQUEST']._serialized_end=183
-  _globals['_STATSREPLY']._serialized_start=185
-  _globals['_STATSREPLY']._serialized_end=219
-  _globals['_CHATSERVICE']._serialized_start=222
-  _globals['_CHATSERVICE']._serialized_end=449
+    DESCRIPTOR._options = None
+    _globals["_MESSAGEREQUEST"]._serialized_start = 25
+    _globals["_MESSAGEREQUEST"]._serialized_end = 96
+    _globals["_MESSAGEREPLY"]._serialized_start = 98
+    _globals["_MESSAGEREPLY"]._serialized_end = 167
+    _globals["_STATSREQUEST"]._serialized_start = 169
+    _globals["_STATSREQUEST"]._serialized_end = 183
+    _globals["_STATSREPLY"]._serialized_start = 185
+    _globals["_STATSREPLY"]._serialized_end = 219
+    _globals["_CHATSERVICE"]._serialized_start = 222
+    _globals["_CHATSERVICE"]._serialized_end = 449
 # @@protoc_insertion_point(module_scope)
