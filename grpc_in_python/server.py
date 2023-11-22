@@ -1,5 +1,5 @@
 import grpc
-from typing import AsyncIterable
+from typing import AsyncIterable, List
 from loguru import logger
 import asyncio
 
@@ -8,10 +8,10 @@ import chat_pb2
 
 
 class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
-    """Provides methods that implement functionality of route guide server."""
+    """Provides methods that implement functionality of chat server."""
 
     def __init__(self):
-        self.messages_received: AsyncIterable[chat_pb2.MessageRequest] = []
+        self.messages_received: List[chat_pb2.MessageRequest] = []
 
     async def GetStats(
         self, request: chat_pb2.EmptyRequest, unused_context

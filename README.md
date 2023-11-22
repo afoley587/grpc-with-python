@@ -187,5 +187,98 @@ If you list your python directory, you would see three new files:
 * `chat_pb2.pyi` - The python interfaces of the message structures
 
 ## Part II: The Server
+We can now walk through the server-side of our code. From a high level,
+we will need a new python class which implements our protobuf service and
+then a method to attach the service to a server and run it until completion.
+
+Let's start with the service:
+
+```python
+import grpc
+from typing import AsyncIterable, List
+from loguru import logger
+import asyncio
+
+import chat_pb2_grpc
+import chat_pb2
+
+
+class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
+    """Provides methods that implement functionality of chat server."""
+
+    def __init__(self):
+        self.messages_received: List[chat_pb2.MessageRequest] = []
+
+    async def GetStats(
+        self, request: chat_pb2.EmptyRequest, unused_context
+    ) -> chat_pb2.StatsReply:
+        return chat_pb2.StatsReply(num_messages=len(self.messages_received))
+
+    async def GetMessages(
+        self, request: chat_pb2.EmptyRequest, unused_context
+    ) -> AsyncIterable[chat_pb2.MessageReply]:
+        for msg in self.messages_received:
+            yield msg
+
+    async def SendAndReceiveMessage(
+        self,
+        request_iterator: AsyncIterable[chat_pb2.MessageRequest],
+        unused_context,
+    ) -> AsyncIterable[chat_pb2.MessageReply]:
+        async for new_msg in request_iterator:
+            self.messages_received.append(new_msg)
+            resp = chat_pb2.MessageReply(
+                message=f"Server Responding to {new_msg.message}",
+                user_from="server",
+                chat_room=new_msg.chat_room,
+            )
+            logger.info(f"Server side got: {new_msg.message} in {new_msg.chat_room}")
+            yield resp
+```
+
+Most of the imports seem standard, but what are these two lines:
+
+```python
+import chat_pb2_grpc
+import chat_pb2
+```
+
+Well, they are the generate python files from our protobuf! How cool!
+We see that our `ChatServiceServicer` class inherits from the service
+defined in the `chat_pb2_grpc` file. 
+
+The methods in the service should look extremely familiar because, again,
+they were defined in our protobuf files. Let's break them down one-by-one.
+
+`GetStats` accepts a request of type `EmptyRequest`. It then counts the
+number of messages it has in memory and returns a `StatsReply` with
+that number of messages.
+
+`GetMessages` accepts a request of type `EmptyRequest`. It then loops 
+through the messages it has seen before and to puts them on 
+the stream. Note that this methoud returns an `AsyncIterable`, so the client 
+will do an `async for ...` over the response from this method.
+
+`SendAndReceiveMessage` accepts a request of 
+`AsyncIterable[chat_pb2.MessageRequest]`. So our client would call this 
+method with multiple messages. The server would then go through the messages
+asyncronously and acknowledge it with a response of type `MessageReply`. This,
+again, returns an `AsyncIterable`.
+
+Finally, we need a way to run the server! Let's define a `serve` method:
+
+```python
+async def serve() -> None:
+    server = grpc.aio.server()
+    chat_pb2_grpc.add_ChatServiceServicer_to_server(ChatServiceServicer(), server)
+    server.add_insecure_port("[::]:50051")
+    await server.start()
+    await server.wait_for_termination()
+```
+
+So we first create a server with gRPC IO calls. Then, we add the chat
+service to the server and start the server.
+
+We can run this with `python server.py`.
 
 ## Part III: The Client
