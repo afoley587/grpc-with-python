@@ -14,12 +14,12 @@ class ChatServiceServicer(chat_pb2_grpc.ChatServiceServicer):
         self.messages_received: AsyncIterable[chat_pb2.MessageRequest] = []
 
     async def GetStats(
-        self, request: chat_pb2.StatsRequest, unused_context
+        self, request: chat_pb2.EmptyRequest, unused_context
     ) -> chat_pb2.StatsReply:
         return chat_pb2.StatsReply(num_messages=len(self.messages_received))
 
     async def GetMessages(
-        self, request: chat_pb2.StatsRequest, unused_context
+        self, request: chat_pb2.EmptyRequest, unused_context
     ) -> AsyncIterable[chat_pb2.MessageReply]:
         for msg in self.messages_received:
             yield msg

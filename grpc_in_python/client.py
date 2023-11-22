@@ -58,7 +58,7 @@ async def chat(stub: chat_pb2_grpc.ChatServiceStub, user: str, chat_room: str) -
 async def stat(stub: chat_pb2_grpc.ChatServiceStub, user: str, chat_room: str) -> None:
     # gRPC AsyncIO bidi-streaming RPC API accepts both synchronous iterables
     # and async iterables.
-    request = chat_pb2.StatsRequest()
+    request = chat_pb2.EmptyRequest()
     stats = await stub.GetStats(request)
     logger.info(f"Server has {stats.num_messages} messages")
 
@@ -66,7 +66,7 @@ async def stat(stub: chat_pb2_grpc.ChatServiceStub, user: str, chat_room: str) -
 async def read(stub: chat_pb2_grpc.ChatServiceStub, user: str, chat_room: str) -> None:
     # gRPC AsyncIO bidi-streaming RPC API accepts both synchronous iterables
     # and async iterables.
-    request = chat_pb2.StatsRequest()
+    request = chat_pb2.EmptyRequest()
     call = stub.GetMessages(request)
     async for response in call:
         logger.info(f"Received message {response.message} in {response.chat_room}")

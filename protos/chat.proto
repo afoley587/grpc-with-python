@@ -11,9 +11,11 @@ package grpc.chat;
 
 // Defines our service interface with methods
 service ChatService {
+  // Get high level stats from the server
+  rpc GetStats(EmptyRequest) returns (StatsReply) {}
+  // Stream the current messages from the server
+  rpc GetMessages(EmptyRequest) returns (stream MessageReply) {}
   // Sends and receives chat messages bi-directionally
-  rpc GetStats(StatsRequest) returns (StatsReply) {}
-  rpc GetMessages(StatsRequest) returns (stream MessageReply) {}
   rpc SendAndReceiveMessage (stream MessageRequest) returns (stream MessageReply) {}
 }
 
@@ -35,8 +37,11 @@ message MessageReply {
   string message = 3;
 }
 
-message StatsRequest {}
+// An empty request for requesting messages or
+// stats from the server
+message EmptyRequest {}
 
+// A statis request from the server
 message StatsReply {
   int32 num_messages = 1;
 }
